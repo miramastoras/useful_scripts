@@ -1,4 +1,5 @@
-# This script updates the populations in a .fam file. 
+# Author: Mira Mastoras
+#This script updates the populations in a .fam file. 
 # It takes in a fam file, and a txt file with the new population label in the first column, 
 # and the ID in the second column 
 # It uses the match function to locate the index in the new pops txt file of each ID in the fam file 
