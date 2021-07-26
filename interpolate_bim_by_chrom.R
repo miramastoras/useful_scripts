@@ -4,6 +4,7 @@
 #       The map file format must have the following four space delimited columns: chr position COMBINED_rate(cM/Mb) Genetic_Map(cM)
 #       the bim file must be tab delimited 
 #       both map and bim file must be run on a single chromosome. 
+#       If a snp isn't covered by the genetic map file, a warning will be printed with its rsid. Please remove these SNPS with plink and rerun
 # Usage: Rscript interpolate_bim_by_chrom.R chr8.bim chr8.map > chr8.newcM
 
 ## To run via command line 
@@ -27,7 +28,7 @@ for (i in 1:length(indexes)) { # calculates the cM for each bim position
   query_index = i
   
   if (start_index == length(map$Genetic_Map.cM.)) { # case that genetic map ends before the given snp in the bim file
-    query_cM=map$Genetic_Map.cM.[start_index]
+    query_cM=paste("WARNING:SNP not in map:", bim$rsid[query_index])
   }
   else {
     start_cM=map$Genetic_Map.cM.[start_index]
