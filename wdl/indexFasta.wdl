@@ -1,5 +1,7 @@
 version 1.0
 
+# index fa file
+
 workflow indexFasta {
     meta {
         author: "Mira Mastoras"
