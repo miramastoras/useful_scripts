@@ -3,3 +3,6 @@ workflows:
    -  name: indexFasta
       subclass: WDL
       primaryDescriptorPath: /wdl/indexFasta.wdl
+   -  name: indexBam
+      subclass: WDL
+      primaryDescriptorPath: /wdl/indexBam.wdl

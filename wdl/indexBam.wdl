@@ -1,23 +1,22 @@
 version 1.0
 
-# index fa file
+# index bam file
 
 workflow indexFasta {
     meta {
         author: "Mira Mastoras"
         email: "mmastora@ucsc.edu"
-        description: "unzip gzipped fasta, index it"
+        description: "index bam file"
     }
     call Index
     output {
-        File outFai = Index.outFai
-        File outFasta = Index.outFasta
+        File outBai = Index.outBai
     }
 }
 
 task Index{
     input {
-        File fastaGZ
+        File inBam
 
         String dockerImage = "kishwars/pepper_deepvariant:r0.8"
         Int memSizeGB = 128
@@ -30,14 +29,10 @@ task Index{
         set -eux -o pipefail
         set -o xtrace
 
-        ID=`basename ~{fastaGZ} | sed 's/.gz$//'`
-
-        gunzip -c ~{fastaGZ} > ${ID}
-        samtools faidx ${ID}
+        samtools index ~{inBam}
     >>>
     output {
-        File outFai =  glob("*a")[0]
-        File outFasta = glob("*.fai")[0]
+        File outFai =  glob("*bai")[0]
     }
     runtime {
         memory: memSizeGB + " GB"
