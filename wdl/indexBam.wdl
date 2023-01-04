@@ -33,7 +33,7 @@ task Index{
 
         # prep maternal
         FILENAME=$(basename -- "~{inBam}")
-        
+
         samtools index ${FILENAME}
     >>>
     output {
