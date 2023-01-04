@@ -2,7 +2,7 @@ version 1.0
 
 # index bam file
 
-workflow indexFasta {
+workflow indexBam {
     meta {
         author: "Mira Mastoras"
         email: "mmastora@ucsc.edu"
@@ -29,10 +29,15 @@ task Index{
         set -eux -o pipefail
         set -o xtrace
 
-        samtools index ~{inBam}
+        ln -s ~{inBam}
+
+        # prep maternal
+        FILENAME=$(basename -- "~{inBam}")
+        
+        samtools index ${FILENAME}
     >>>
     output {
-        File outFai =  glob("*bai")[0]
+        File outBai =  glob("*bai")[0]
     }
     runtime {
         memory: memSizeGB + " GB"
