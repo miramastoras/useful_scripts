@@ -6,7 +6,7 @@ workflow indexFasta {
     meta {
         author: "Mira Mastoras"
         email: "mmastora@ucsc.edu"
-        description: "unzip gzipped fasta, index it"
+        description: "Index Fasta with samtools "
     }
     call Index
     output {
@@ -17,7 +17,7 @@ workflow indexFasta {
 
 task Index{
     input {
-        File fastaGZ
+        File fasta
 
         String dockerImage = "kishwars/pepper_deepvariant:r0.8"
         Int memSizeGB = 128
@@ -30,9 +30,16 @@ task Index{
         set -eux -o pipefail
         set -o xtrace
 
-        ID=`basename ~{fastaGZ} | sed 's/.gz$//'`
+        FILENAME=$(basename -- "~{fasta}")
+        SUFFIX="${FILENAME##*.}"
 
-        gunzip -c ~{fastaGZ} > ${ID}
+        if [[ "$SUFFIX" == "gz" ]] ; then
+            ID=`basename ~{fasta} | sed 's/.gz$//'`
+            gunzip -c ~{fasta} > ${ID}
+        else
+            ID=$FILENAME
+            ln -s ~{fasta} ./$ID
+        fi
         samtools faidx ${ID}
     >>>
     output {
