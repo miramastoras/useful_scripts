@@ -11,7 +11,6 @@ workflow indexFasta {
     call Index
     output {
         File outFai = Index.outFai
-        File outFasta = Index.outFasta
     }
 }
 
@@ -43,8 +42,7 @@ task Index{
         samtools faidx ${ID}
     >>>
     output {
-        File outFai =  glob("*a")[0]
-        File outFasta = glob("*.fai")[0]
+        File outFai = glob("*.fai")[0]
     }
     runtime {
         memory: memSizeGB + " GB"

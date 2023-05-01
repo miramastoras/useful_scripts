@@ -1,7 +1,7 @@
 '''
 Purpose: calculate projected QV from performance in GIAB truth regions.Assumes unphased GIAB variants
 Author: Mira Mastoras, mmastora@ucsc.edu
-Usage: python3 calc_QV_from_GIAB.py -v /Users/miramastoras/Desktop/whole_genome_variants/raw_asm_eval_chr20_happy.vcf -b /Users/miramastoras/Desktop/whole_genome_variants/HG002.GIAB.4.2.1.benchmark_noinconsistent.dip.projectable.bed
+Usage: python3 calc_QV_from_GIAB.py -v /Users/miramastoras/Desktop/whole_genome_variants/raw_asm_eval_chr20_happy.vcf -b /Users/miramastoras/Desktop/whole_genome_variants/HG002.GIAB.4.2.1.benchmark_noinconsistent.dip.projection.bed
 '''
 
 import argparse
@@ -26,6 +26,7 @@ def get_false_bases(happy_vcf):
     Get count of false bases from hap,py vcf
     '''
     n_false = 0
+    n_true_insertions=0
     with open(happy_vcf, 'r') as f:
         for line in f:
             line = line.strip()
@@ -40,7 +41,7 @@ def get_false_bases(happy_vcf):
                 if "UNK" in truth_col or "UNK" in query_col:
                     continue
                 # if we have a false variant:
-                if "FP" in truth_col or "FN" in truth_col or "FP" in query_col or "FN" in query_col:
+                if "F" in truth_col or "F" in query_col:
                     # put alles indexed into a list based on their order (0,1,2) in the vcf etc
                     alleles=line[3].split(",") + line[4].split(",")
                     # get genotype of query and truth
@@ -54,13 +55,30 @@ def get_false_bases(happy_vcf):
                     if query_gt[0]==".":
                         query_gt = [0 , 0]
 
+                    # calculate errors by counting number of bases involved in false allele
+                    # for al in query_gt:
+                    #     # check if each allele in query_gt matches any allele in truth_gt. This deals with the errors on each haplotype
+                    #     if int(al) == int(truth_gt[0]) or int(truth_gt[1]):
+                    #         pass
+                    #     else:
+                    #         # add length of false alleles to (# false bases)
+                    #        n_false += len(alleles[int(al)])
+
+                    # # calculate errors by subtracting false allele from truth allele
+                    # total_true_bases=len(alleles[int(truth_gt[0])]) + len(alleles[int(truth_gt[1])])
+                    # total_query_bases=len(alleles[int(query_gt[0])]) + len(alleles[int(query_gt[1])])
+                    #
+                    #n_false += abs(total_query_bases-total_true_bases)
+
+                    # count each error as 1
                     for al in query_gt:
                         # check if each allele in query_gt matches any allele in truth_gt. This deals with the errors on each haplotype
                         if int(al) == int(truth_gt[0]) or int(truth_gt[1]):
                             pass
                         else:
                             # add length of false alleles to (# false bases)
-                           n_false += len(alleles[int(al)])
+                           n_false += 2
+
     return n_false
 
 def count_bases_in_bed(bedfile):
@@ -86,12 +104,11 @@ def main():
     n_total = count_bases_in_bed(args.bedfile)
 
     # get num false bases from hap.py vcf
-    n_false=get_false_bases(args.happy_vcf)
+    n_false =get_false_bases(args.happy_vcf)
 
     # Calculate QV and print
     E= n_false / n_total
     print(n_false, n_total)
-    print(E)
     QV=-10 * (math.log(E,10))
     print(QV)
 
