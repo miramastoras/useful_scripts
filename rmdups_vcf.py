@@ -1,7 +1,7 @@
 '''
 Purpose: keep only one copy of duplicate entries in vcf
 Author: Mira Mastoras, mmastora@ucsc.edu
-Usage: python3 rmdups_vcf.py -i ~/Desktop/HG002_run1_GQ10_mapq_x_vars_dip_polisher_output.chr20.vcf.gz
+Usage: python3 rmdups_vcf.py -i ~/Desktop/HG002_hifiasm_wgs_dip_polisher_output.sorted.merged.PASS.nostar.vcf.gz -o
 '''
 
 import argparse
@@ -18,6 +18,9 @@ def arg_parser():
     parser.add_argument("-i", "--vcf_file",
                         required=True,
                         help="input vcf")
+    parser.add_argument("-o", "--output_file",
+                        required=False,
+                        help="optionally specify different output file")
 
     return parser.parse_args()
 
@@ -29,7 +32,10 @@ def main():
 
     vcf_in = VariantFile(args.vcf_file)  # auto-detect input format
 
-    outname=args.vcf_file.replace(".vcf.gz", "_filt.vcf.gz")
+    if args.output_file:
+        outname=args.output_file
+    else:
+        outname=args.vcf_file.replace(".vcf.gz", "_filt.vcf.gz")
     print(outname)
 
     vcf_out = VariantFile(outname, 'w', header=vcf_in.header)
